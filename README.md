@@ -1,16 +1,28 @@
 # 🔐 Secure Data Encryption App
 
-This app lets users securely store and retrieve sensitive data using strong encryption and password protection.
+**Made with ❤️ by Asad Shabir**
 
-## Features
-- AES-based encryption (Fernet)
-- Password-protected storage
-- No cloud storage – session-only
-- Built with Streamlit
+A beautiful, safe, and modern app to store and retrieve encrypted data using a secure passkey. Built with `Streamlit`, `cryptography`, and Python magic. 🚀
 
-👨‍💻 **Made by Asad Shabir**
+## 📦 Features
+- 🔒 Secure encryption and decryption
+- 🔑 Password-protected data retrieval
+- 💾 Session-based memory
+- 🎨 Stylish UI with colorful layout and emoji feedback
+- 🧠 Educational and practical project
 
-## Run Locally
+## 🖼️ Preview
+![Secure Data Encryption App Screenshot](screenshot.png)
+
+## 🛠️ Tech Used
+- Python 🐍
+- Streamlit 📊
+- cryptography 🔐
+- Fernet key system 🔑
+
+## 🚀 How to Run Locally
 ```bash
+git clone https://github.com/yourusername/secure-data-encryption-app.git
+cd secure-data-encryption-app
 pip install -r requirements.txt
 streamlit run app.py

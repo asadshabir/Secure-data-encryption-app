@@ -1,57 +1,78 @@
 import streamlit as st
-import hashlib
 from cryptography.fernet import Fernet
+import os
 
-# App Title
-st.set_page_config(page_title="🔐 Secure Data Vault", page_icon="🔐")
-st.markdown("<h1 style='text-align: center; color: teal;'>🔐 Secure Data Encryption App</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; color: gray;'>Made by <strong style='color: magenta;'>Asad Shabir</strong></p>", unsafe_allow_html=True)
+# ---------- Save/load encryption key ----------
+KEY_FILE = "secret.key"
 
-# Setup state
-if "vault" not in st.session_state:
-    st.session_state.vault = {}
+def save_key():
+    key = Fernet.generate_key()
+    with open(KEY_FILE, "wb") as f:
+        f.write(key)
+    return key
 
-# Fernet Key
-key = Fernet.generate_key()
-cipher = Fernet(key)
+def load_key():
+    if os.path.exists(KEY_FILE):
+        with open(KEY_FILE, "rb") as f:
+            return f.read()
+    return save_key()
 
-# Functions
-def hash_pass(passkey):
-    return hashlib.sha256(passkey.encode()).hexdigest()
+cipher = Fernet(load_key())
 
-def encrypt_text(data):
-    return cipher.encrypt(data.encode()).decode()
+# ---------- Encrypt/Decrypt ----------
+def encrypt_text(text):
+    return cipher.encrypt(text.encode()).decode()
 
-def decrypt_text(enc, passkey):
-    stored = st.session_state.vault.get(enc)
-    if not stored:
+def decrypt_text(token):
+    try:
+        return cipher.decrypt(token.encode()).decode()
+    except Exception:
         return None
-    if stored["passkey"] == hash_pass(passkey):
-        return cipher.decrypt(enc.encode()).decode()
-    return None
 
-# UI
-tab1, tab2 = st.tabs(["🔒 Store Data", "🔓 Retrieve Data"])
+# ---------- Streamlit App ----------
+st.set_page_config(page_title="Secure Vault 🔐", page_icon="🔒", layout="centered")
 
-with tab1:
-    st.subheader("Save Your Secret")
-    secret = st.text_area("Enter data:")
-    passkey = st.text_input("Set a passkey:", type="password")
-    if st.button("Encrypt & Store"):
-        if secret and passkey:
-            encrypted = encrypt_text(secret)
-            st.session_state.vault[encrypted] = {"passkey": hash_pass(passkey)}
-            st.success("✅ Data Encrypted & Stored!")
-            st.code(encrypted)
+# Header
+st.markdown("<h1 style='text-align: center; color: #4CAF50;'>🔐 Secure Data Encryption App</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center;'>✨ Made by <strong style='color: #FF5722;'>Asad Shabir</strong></p>", unsafe_allow_html=True)
 
-with tab2:
-    st.subheader("Get Back Your Data")
-    enc_input = st.text_area("Paste encrypted text:")
-    pass_input = st.text_input("Enter passkey:", type="password")
-    if st.button("Decrypt"):
-        result = decrypt_text(enc_input, pass_input)
-        if result:
-            st.success("🎉 Decrypted Successfully!")
-            st.code(result)
+# Custom Menu
+menu = st.selectbox("📁 Choose an option:", ["🏠 Home", "🔒 Encrypt Data", "🔓 Decrypt Data"])
+
+# Home
+if menu == "🏠 Home":
+    st.success("Welcome! Use this app to securely encrypt and decrypt your sensitive data.")
+    st.info("🔐 Your data is encrypted using Fernet encryption and stored only temporarily in memory.")
+
+# Encrypt Section
+elif menu == "🔒 Encrypt Data":
+    st.subheader("🔒 Store Your Secret")
+    secret_text = st.text_area("Enter text to encrypt:")
+    
+    if st.button("Encrypt 🔐"):
+        if secret_text:
+            encrypted = encrypt_text(secret_text)
+            st.success("✅ Encrypted Text:")
+            st.code(encrypted, language="text")
         else:
-            st.error("❌ Failed! Check encrypted text or passkey.")
+            st.warning("⚠️ Please enter some text.")
+
+# Decrypt Section
+elif menu == "🔓 Decrypt Data":
+    st.subheader("🔓 Get Back Your Secret")
+    enc_input = st.text_area("Paste encrypted text here:")
+
+    if st.button("Decrypt 🔓"):
+        if enc_input:
+            result = decrypt_text(enc_input)
+            if result:
+                st.success("✅ Decrypted Text:")
+                st.code(result, language="text")
+            else:
+                st.error("❌ Failed! Check encrypted text.")
+        else:
+            st.warning("⚠️ Please provide encrypted input.")
+
+# Footer
+st.markdown("---")
+st.markdown("<p style='text-align: center;'>🔐 End-to-End Encryption | Streamlit UI | 💻 Python Project</p>", unsafe_allow_html=True)
