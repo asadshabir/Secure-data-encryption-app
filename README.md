@@ -22,7 +22,7 @@ A beautiful, safe, and modern app to store and retrieve encrypted data using a s
 
 ## 🚀 How to Run Locally
 ```bash
-git clone https://github.com/yourusername/secure-data-encryption-app.git
+git clone https://github.com/asadshabir/Secure-data-encryption-app
 cd secure-data-encryption-app
 pip install -r requirements.txt
 streamlit run app.py
